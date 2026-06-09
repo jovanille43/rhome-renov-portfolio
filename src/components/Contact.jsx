@@ -1,36 +1,48 @@
-import { useState, useId } from 'react'
+import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { MapPin, Mail, User, Award, ArrowUpRight, Phone } from 'lucide-react'
+import { MapPin, Mail, User, Award, ArrowUpRight, Clock } from 'lucide-react'
 
 const RED  = '#C8181E'
 const BLUE = '#00A3D5'
 const ease = [0.22, 1, 0.36, 1]
 
 const INFOS = [
-  { Icon: MapPin, label: 'Adresse',       val: '14 Chemin des Rochers\n43120 Monistrol-sur-Loire', accent: RED  },
-  { Icon: Mail,   label: 'Email',         val: 'rhomerenov43@gmail.com', href: 'mailto:rhomerenov43@gmail.com', accent: BLUE },
-  { Icon: Phone,  label: 'Téléphone',     val: 'Nous appeler',           href: 'tel:+33000000000',              accent: RED  },
-  { Icon: User,   label: 'Dirigeant',     val: 'Romain Fanget',          accent: BLUE },
-  { Icon: Award,  label: 'Certification', val: 'RGE — Reconnu Garant de l\'Environnement', accent: RED },
+  {
+    Icon: MapPin,
+    label: 'Adresse',
+    val: '14 Chemin des Rochers\n43120 Monistrol-sur-Loire',
+    accent: RED,
+  },
+  {
+    Icon: Mail,
+    label: 'Email',
+    val: 'rhomerenov43@gmail.com',
+    href: 'mailto:rhomerenov43@gmail.com',
+    accent: BLUE,
+  },
+  {
+    Icon: Clock,
+    label: 'Disponibilité',
+    val: 'Lun – Ven, 8h – 18h\nRéponse sous 24h',
+    accent: RED,
+  },
+  {
+    Icon: User,
+    label: 'Dirigeant',
+    val: 'Romain Fanget',
+    accent: BLUE,
+  },
+  {
+    Icon: Award,
+    label: 'Certification',
+    val: 'RGE — Reconnu Garant\nde l\'Environnement',
+    accent: RED,
+  },
 ]
 
 const SERVICES_OPT = ['Salle de bain', 'Plomberie', 'Chauffage', 'Climatisation', 'Autre']
 
-function Field({ label, children }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <label
-        className="text-[10px] font-medium tracking-widest uppercase"
-        style={{ color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Sans', sans-serif" }}
-      >
-        {label}
-      </label>
-      {children}
-    </div>
-  )
-}
-
-const inputBase = {
+const inputStyle = {
   background:   '#0C0C0C',
   border:       '1px solid rgba(255,255,255,0.08)',
   color:        'white',
@@ -43,31 +55,44 @@ const inputBase = {
   transition:   'border-color 200ms',
 }
 
+function Field({ id, label, required, children }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label
+        htmlFor={id}
+        className="text-[10px] font-medium tracking-widest uppercase"
+        style={{ color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Sans', sans-serif" }}
+      >
+        {label}{required && <span aria-hidden> *</span>}
+      </label>
+      {children}
+    </div>
+  )
+}
+
 export default function Contact() {
   const [form, setForm]       = useState({ name: '', email: '', phone: '', service: '', message: '' })
   const [sending, setSending] = useState(false)
   const shouldReduce = useReducedMotion()
-  const uid = useId()
 
   const set = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }))
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setSending(true)
-    const link = `mailto:rhomerenov43@gmail.com?subject=Demande ${encodeURIComponent(form.service)}&body=${encodeURIComponent(
-      `Nom: ${form.name}\nEmail: ${form.email}\nTél: ${form.phone}\n\n${form.message}`
-    )}`
-    window.location.href = link
+    const body = `Nom: ${form.name}\nEmail: ${form.email}\nService: ${form.service}\n\n${form.message}`
+    window.location.href = `mailto:rhomerenov43@gmail.com?subject=${encodeURIComponent('Demande ' + form.service)}&body=${encodeURIComponent(body)}`
     setTimeout(() => setSending(false), 2000)
   }
 
-  const focus = (color) => (e) => (e.target.style.borderColor = color)
-  const blur  = (e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')
+  const focusRed  = (e) => (e.target.style.borderColor = RED)
+  const focusBlue = (e) => (e.target.style.borderColor = BLUE)
+  const blur      = (e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')
 
   return (
     <section
       id="contact"
-      aria-label="Nous contacter"
+      aria-labelledby="contact-heading"
       className="py-24 md:py-36 px-5 sm:px-8 md:px-12"
       style={{ background: '#000' }}
     >
@@ -88,6 +113,7 @@ export default function Contact() {
             Parlons de votre projet
           </p>
           <h2
+            id="contact-heading"
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               fontSize: 'clamp(3rem, 8vw, 7rem)',
@@ -119,7 +145,7 @@ export default function Contact() {
               style={{ color: 'rgba(255,255,255,0.4)', fontFamily: "'DM Sans', sans-serif", maxWidth: '44ch' }}
             >
               Décrivez votre projet, nous vous répondons sous{' '}
-              <strong style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>48h</strong>{' '}
+              <strong style={{ color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>48h</strong>{' '}
               avec une proposition adaptée à vos besoins et à votre budget.
             </p>
 
@@ -128,14 +154,15 @@ export default function Contact() {
                 <div key={label} className="flex items-start gap-4">
                   <dt className="sr-only">{label}</dt>
                   <div
+                    aria-hidden
                     className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                     style={{ background: `${accent}12`, border: `1px solid ${accent}28` }}
-                    aria-hidden
                   >
                     <Icon size={15} color={accent} strokeWidth={1.8} />
                   </div>
                   <div>
                     <p
+                      aria-hidden
                       className="text-[9px] font-medium tracking-widest uppercase mb-1"
                       style={{ color: accent, fontFamily: "'DM Sans', sans-serif" }}
                     >
@@ -152,7 +179,7 @@ export default function Contact() {
                         </a>
                       ) : (
                         <p
-                          className="text-sm font-medium text-white"
+                          className="text-sm font-medium text-white/80"
                           style={{ fontFamily: "'DM Sans', sans-serif", whiteSpace: 'pre-line' }}
                         >
                           {val}
@@ -172,48 +199,55 @@ export default function Contact() {
             viewport={{ once: true }}
             transition={{ duration: shouldReduce ? 0 : 0.65, ease }}
           >
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4" aria-label="Formulaire de contact">
-
-              <Field label="Nom complet *">
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-4"
+              aria-label="Formulaire de demande de devis"
+            >
+              <Field id="f-name" label="Nom complet" required>
                 <input
-                  type="text" name="name" id={`${uid}-name`}
+                  type="text" name="name" id="f-name"
                   value={form.name} onChange={set} required
                   placeholder="Votre nom"
                   aria-required="true"
-                  style={inputBase}
-                  onFocus={focus(RED)} onBlur={blur}
+                  autoComplete="name"
+                  style={inputStyle}
+                  onFocus={focusRed} onBlur={blur}
                 />
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Email *">
+                <Field id="f-email" label="Email" required>
                   <input
-                    type="email" name="email" id={`${uid}-email`}
+                    type="email" name="email" id="f-email"
                     value={form.email} onChange={set} required
                     placeholder="votre@email.com"
                     aria-required="true"
-                    style={inputBase}
-                    onFocus={focus(RED)} onBlur={blur}
+                    autoComplete="email"
+                    style={inputStyle}
+                    onFocus={focusRed} onBlur={blur}
                   />
                 </Field>
-                <Field label="Téléphone">
+                <Field id="f-phone" label="Téléphone">
                   <input
-                    type="tel" name="phone" id={`${uid}-phone`}
+                    type="tel" name="phone" id="f-phone"
                     value={form.phone} onChange={set}
                     placeholder="06 00 00 00 00"
-                    style={inputBase}
-                    onFocus={focus(BLUE)} onBlur={blur}
+                    autoComplete="tel"
+                    style={inputStyle}
+                    onFocus={focusBlue} onBlur={blur}
                   />
                 </Field>
               </div>
 
-              <Field label="Type de service *">
+              <Field id="f-service" label="Type de service" required>
                 <select
-                  name="service" id={`${uid}-service`}
+                  name="service" id="f-service"
                   value={form.service} onChange={set} required
                   aria-required="true"
-                  style={{ ...inputBase, appearance: 'none', cursor: 'pointer' }}
-                  onFocus={focus(RED)} onBlur={blur}
+                  style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
+                  onFocus={focusRed} onBlur={blur}
                 >
                   <option value="" style={{ background: '#0C0C0C' }}>Choisir un service</option>
                   {SERVICES_OPT.map((s) => (
@@ -222,15 +256,15 @@ export default function Contact() {
                 </select>
               </Field>
 
-              <Field label="Description du projet *">
+              <Field id="f-message" label="Description du projet" required>
                 <textarea
-                  name="message" id={`${uid}-message`}
+                  name="message" id="f-message"
                   value={form.message} onChange={set} required
                   rows={5}
                   placeholder="Décrivez votre projet : surface, contraintes, délai souhaité…"
                   aria-required="true"
-                  style={{ ...inputBase, resize: 'none' }}
-                  onFocus={focus(RED)} onBlur={blur}
+                  style={{ ...inputStyle, resize: 'none' }}
+                  onFocus={focusRed} onBlur={blur}
                 />
               </Field>
 
@@ -239,16 +273,21 @@ export default function Contact() {
                 disabled={sending}
                 whileHover={shouldReduce ? {} : { scale: 1.015 }}
                 whileTap={shouldReduce ? {} : { scale: 0.985 }}
-                className="flex items-center justify-center gap-2 w-full py-4 font-medium text-xs tracking-widest uppercase text-white transition-opacity duration-200 disabled:opacity-60"
+                className="flex items-center justify-center gap-2 w-full py-4 font-medium text-xs tracking-widest uppercase text-white transition-opacity duration-200 disabled:opacity-60 cursor-pointer"
                 style={{ background: RED, fontFamily: "'DM Sans', sans-serif" }}
                 aria-live="polite"
+                aria-disabled={sending}
               >
-                {sending ? 'Envoi en cours…' : <>Envoyer la demande <ArrowUpRight size={14} aria-hidden /></>}
+                {sending
+                  ? 'Ouverture de votre messagerie…'
+                  : <><span>Envoyer la demande</span><ArrowUpRight size={14} aria-hidden /></>
+                }
               </motion.button>
 
               <p
                 className="text-[10px] text-center"
                 style={{ color: 'rgba(255,255,255,0.2)', fontFamily: "'DM Sans', sans-serif" }}
+                aria-live="polite"
               >
                 Réponse garantie sous 48h — Devis gratuit et sans engagement
               </p>
