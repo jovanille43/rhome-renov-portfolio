@@ -1,160 +1,234 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 
 const RED  = '#C8181E'
 const BLUE = '#00A3D5'
+const ease = [0.22, 1, 0.36, 1]
 
-const projects = [
+const ALL = [
   {
     id: 1,
-    category: 'Salle de Bain',
-    title: 'Suite Parentale Moderne',
-    description: 'Rénovation complète : douche à l\'italienne grand format, double vasque suspendue, carrelage grès cérame effet béton.',
+    cat: 'Salle de Bain',
+    title: 'Suite Parentale Minimaliste',
+    desc: 'Douche à l\'italienne 140×90, double vasque suspendue, carrelage grès cérame 120×60 effet béton. Surface : 12m².',
     accent: RED,
-    pattern: 'linear-gradient(135deg, #1a0404 0%, #3d0b0b 50%, #1a0404 100%)',
+    span: 'lg:col-span-2',
+    pattern: `linear-gradient(135deg, #1a0303 0%, #3d0808 45%, #200505 100%)`,
   },
   {
     id: 2,
-    category: 'Chauffage',
-    title: 'Pompe à Chaleur Air/Eau',
-    description: 'Installation complète PAC + plancher chauffant basse température dans une maison de 180m². Économies d\'énergie de 65%.',
+    cat: 'Chauffage',
+    title: 'PAC Air/Eau — 180m²',
+    desc: 'Pompe à chaleur Atlantic + plancher chauffant basse température. Économies d\'énergie : 65%. MaPrimeRénov\' obtenu.',
     accent: BLUE,
-    pattern: 'linear-gradient(135deg, #001a24 0%, #003d56 50%, #001a24 100%)',
+    span: '',
+    pattern: `linear-gradient(135deg, #001826 0%, #003d56 50%, #001426 100%)`,
   },
   {
     id: 3,
-    category: 'Plomberie',
-    title: 'Rénovation Réseau Complet',
-    description: 'Mise aux normes complète du réseau de plomberie d\'une maison ancienne : cuivre, PER, raccords multicouches.',
-    accent: RED,
-    pattern: 'linear-gradient(135deg, #1a0404 0%, #2d0808 50%, #1a0404 100%)',
+    cat: 'Plomberie',
+    title: 'Mise aux Normes Complète',
+    desc: 'Remplacement réseau plomberie maison 1960. Cuivre et PER multicouche, chauffe-eau thermodynamique 270L.',
+    accent: BLUE,
+    span: '',
+    pattern: `linear-gradient(135deg, #001420 0%, #003050 50%, #001020 100%)`,
   },
   {
     id: 4,
-    category: 'Salle de Bain',
-    title: 'Salle de Bain Haut de Gamme',
-    description: 'Projet prestige : baignoire îlot, colonne de douche hydro-massage, carrelage travertin, robinetterie dorée.',
-    accent: BLUE,
-    pattern: 'linear-gradient(135deg, #001a24 0%, #00263a 50%, #001a24 100%)',
+    cat: 'Salle de Bain',
+    title: 'Salle de Bain Prestige',
+    desc: 'Baignoire îlot autoportante, colonne hydromassante, faïence travertin format 80×80, robinetterie dorée mat.',
+    accent: RED,
+    span: 'lg:col-span-2',
+    pattern: `linear-gradient(135deg, #180303 0%, #350707 50%, #180303 100%)`,
   },
 ]
 
+const CATS = ['Tous', 'Salle de Bain', 'Chauffage', 'Plomberie']
+
 export default function Projects() {
+  const [active, setActive] = useState('Tous')
+  const shouldReduce = useReducedMotion()
+
+  const filtered = active === 'Tous' ? ALL : ALL.filter((p) => p.cat === active)
+
   return (
-    <section id="projets" className="py-24 md:py-36 px-5 sm:px-8 md:px-12 bg-[#060912]">
+    <section
+      id="projets"
+      aria-label="Nos réalisations"
+      className="py-24 md:py-36 px-5 sm:px-8 md:px-12"
+      style={{ background: '#060606' }}
+    >
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        <motion.header
+          initial={{ opacity: 0, y: shouldReduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 md:mb-24"
+          transition={{ duration: shouldReduce ? 0 : 0.6, ease }}
+          className="mb-14 md:mb-20"
         >
           <p
-            className="text-xs font-semibold tracking-widest uppercase mb-4"
-            style={{ color: BLUE }}
+            className="text-xs font-medium tracking-widest uppercase mb-3"
+            style={{ color: BLUE, fontFamily: "'DM Sans', sans-serif" }}
           >
             Portfolio
           </p>
+
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <h2
-              className="text-5xl md:text-7xl font-semibold uppercase tracking-tight text-white"
-              style={{ lineHeight: 0.9 }}
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: 'clamp(3rem, 8vw, 7rem)',
+                lineHeight: 0.88,
+                letterSpacing: '0.04em',
+              }}
             >
-              Nos<br />
+              <span className="text-white">Nos </span>
               <span style={{ color: BLUE }}>Réalisations</span>
             </h2>
+
             <a
               href="#contact"
-              className="hidden md:flex items-center gap-2 text-sm font-semibold tracking-widest uppercase whitespace-nowrap"
-              style={{ color: RED }}
+              className="hidden md:flex items-center gap-2 text-sm font-medium tracking-widest uppercase transition-opacity duration-200 hover:opacity-75"
+              style={{ color: RED, fontFamily: "'DM Sans', sans-serif" }}
+              aria-label="Discuter de votre projet"
             >
-              Votre projet <ArrowUpRight size={16} />
+              Votre projet <ArrowUpRight size={14} aria-hidden />
             </a>
           </div>
-          <div className="mt-8 h-px" style={{ background: `linear-gradient(90deg, ${BLUE}, ${RED}, transparent)` }} />
-        </motion.div>
 
-        {/* Projects grid */}
-        <div className="grid md:grid-cols-2 gap-px bg-white/10">
-          {projects.map((project, i) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              viewport={{ once: true }}
-              className="group bg-[#060912] overflow-hidden"
-            >
-              {/* Visual placeholder */}
-              <div
-                className="h-56 md:h-72 relative flex items-center justify-center overflow-hidden"
-                style={{ background: project.pattern }}
+          <div
+            className="mt-8 h-px"
+            style={{ background: `linear-gradient(90deg, ${BLUE}, ${RED}, transparent)` }}
+          />
+
+          {/* Filter tabs */}
+          <div role="tablist" aria-label="Filtrer par catégorie" className="flex flex-wrap gap-2 mt-8">
+            {CATS.map((cat) => (
+              <button
+                key={cat}
+                role="tab"
+                aria-selected={active === cat}
+                onClick={() => setActive(cat)}
+                className="px-4 py-1.5 text-[10px] font-medium tracking-widest uppercase transition-all duration-200"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  background:   active === cat ? RED : 'transparent',
+                  color:        active === cat ? '#fff' : 'rgba(255,255,255,0.4)',
+                  border:       `1px solid ${active === cat ? RED : 'rgba(255,255,255,0.1)'}`,
+                }}
               >
-                {/* Animated concentric rings */}
-                <motion.div
-                  animate={{ scale: [1, 1.08, 1], opacity: [0.15, 0.3, 0.15] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute w-48 h-48 rounded-full border"
-                  style={{ borderColor: project.accent }}
-                />
-                <motion.div
-                  animate={{ scale: [1.08, 1, 1.08], opacity: [0.1, 0.2, 0.1] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                  className="absolute w-32 h-32 rounded-full border"
-                  style={{ borderColor: project.accent }}
-                />
+                {cat}
+              </button>
+            ))}
+          </div>
+        </motion.header>
+
+        {/* Grid */}
+        <div
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-px"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+        >
+          <AnimatePresence mode="popLayout">
+            {filtered.map((p, i) => (
+              <motion.article
+                key={p.id}
+                layout
+                initial={{ opacity: 0, scale: shouldReduce ? 1 : 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: shouldReduce ? 1 : 0.97 }}
+                transition={{ delay: shouldReduce ? 0 : i * 0.08, duration: shouldReduce ? 0 : 0.5, ease }}
+                className={`group overflow-hidden ${p.span}`}
+                style={{ background: '#060606' }}
+              >
+                {/* Visual placeholder with animated rings */}
                 <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{ background: `${project.accent}22`, border: `2px solid ${project.accent}` }}
+                  className="relative flex items-center justify-center overflow-hidden"
+                  style={{
+                    height: p.span ? '280px' : '220px',
+                    background: p.pattern,
+                  }}
+                  aria-hidden
                 >
-                  <div className="w-4 h-4 rounded-full" style={{ background: project.accent }} />
+                  {/* Pulsing rings */}
+                  <motion.div
+                    animate={shouldReduce ? {} : { scale: [1, 1.1, 1], opacity: [0.12, 0.22, 0.12] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute w-40 h-40 rounded-full border"
+                    style={{ borderColor: p.accent }}
+                  />
+                  <motion.div
+                    animate={shouldReduce ? {} : { scale: [1.08, 1, 1.08], opacity: [0.06, 0.14, 0.06] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                    className="absolute w-28 h-28 rounded-full border"
+                    style={{ borderColor: p.accent }}
+                  />
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ background: `${p.accent}20`, border: `1.5px solid ${p.accent}` }}
+                  >
+                    <div className="w-3 h-3 rounded-full" style={{ background: p.accent }} />
+                  </div>
+
+                  {/* Category pill */}
+                  <div
+                    className="absolute top-4 left-4 px-2.5 py-1 text-[9px] font-medium tracking-widest uppercase"
+                    style={{
+                      background: `${p.accent}20`,
+                      border: `1px solid ${p.accent}50`,
+                      color: p.accent,
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    {p.cat}
+                  </div>
                 </div>
 
-                {/* Category pill */}
-                <div
-                  className="absolute top-4 left-4 px-3 py-1 text-[10px] font-semibold tracking-widest uppercase"
-                  style={{ background: `${project.accent}22`, border: `1px solid ${project.accent}60`, color: project.accent }}
-                >
-                  {project.category}
+                {/* Content */}
+                <div className="p-6 md:p-8 flex flex-col gap-3 border-t border-white/05">
+                  <h3
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: '1.5rem',
+                      letterSpacing: '0.05em',
+                      color: 'white',
+                    }}
+                  >
+                    {p.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: 'rgba(255,255,255,0.4)', fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    {p.desc}
+                  </p>
+                  <a
+                    href="#contact"
+                    className="mt-1 self-start flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ color: p.accent, fontFamily: "'DM Sans', sans-serif" }}
+                    aria-label={`Projet similaire à ${p.title}`}
+                  >
+                    Projet similaire <ArrowUpRight size={11} aria-hidden />
+                  </a>
                 </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6 md:p-8 flex flex-col gap-3">
-                <h3 className="text-xl md:text-2xl font-semibold uppercase tracking-wide text-white">
-                  {project.title}
-                </h3>
-                <p className="text-sm text-white/50 leading-relaxed font-medium">
-                  {project.description}
-                </p>
-                <a
-                  href="#contact"
-                  className="mt-2 flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase self-start opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ color: project.accent }}
-                >
-                  Projet similaire <ArrowUpRight size={12} />
-                </a>
-              </div>
-            </motion.div>
-          ))}
+              </motion.article>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Mobile CTA */}
-        <motion.div
-          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6 }} viewport={{ once: true }}
-          className="mt-8 text-center md:hidden"
-        >
+        <div className="mt-8 flex justify-center md:hidden">
           <a
             href="#contact"
-            className="inline-flex items-center gap-2 text-sm font-semibold tracking-widest uppercase"
-            style={{ color: RED }}
+            className="flex items-center gap-2 text-xs font-medium tracking-widest uppercase"
+            style={{ color: RED, fontFamily: "'DM Sans', sans-serif" }}
           >
-            Votre projet <ArrowUpRight size={14} />
+            Discuter de votre projet <ArrowUpRight size={12} aria-hidden />
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

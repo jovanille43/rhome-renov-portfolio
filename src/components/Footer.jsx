@@ -1,115 +1,157 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { MapPin, Mail, ArrowUpRight } from 'lucide-react'
 
 const RED  = '#C8181E'
 const BLUE = '#00A3D5'
+const YEAR = new Date().getFullYear()
 
-const year = new Date().getFullYear()
-
-const cols = [
+const COLS = [
   {
-    heading: 'Services',
+    title: 'Services',
     links: [
-      { label: 'Salle de Bain',       href: '#services' },
-      { label: 'Plomberie Générale',  href: '#services' },
-      { label: 'Chauffage',           href: '#services' },
-      { label: 'Climatisation',       href: '#services' },
+      { label: 'Salle de Bain',      href: '#services' },
+      { label: 'Plomberie Générale', href: '#services' },
+      { label: 'Chauffage',          href: '#services' },
+      { label: 'Climatisation',      href: '#services' },
     ],
   },
   {
-    heading: 'Navigation',
+    title: 'Navigation',
     links: [
-      { label: 'Accueil',      href: '#accueil'  },
-      { label: 'Réalisations', href: '#projets'  },
-      { label: 'À Propos',     href: '#à-propos' },
-      { label: 'Contact',      href: '#contact'  },
+      { label: 'Accueil',      href: '#accueil'    },
+      { label: 'Réalisations', href: '#projets'    },
+      { label: 'Processus',    href: '#processus'  },
+      { label: 'Contact',      href: '#contact'    },
     ],
   },
 ]
 
 export default function Footer() {
+  const shouldReduce = useReducedMotion()
+
   return (
     <motion.footer
-      initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-      transition={{ duration: 0.7 }} viewport={{ once: true }}
-      className="bg-[#0a0e27]"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: shouldReduce ? 0 : 0.6 }}
+      style={{ background: '#060606', fontFamily: "'DM Sans', sans-serif" }}
+      aria-label="Pied de page"
     >
-      {/* Top gradient line */}
-      <div className="h-px" style={{ background: `linear-gradient(90deg, ${RED}, ${BLUE})` }} />
+      {/* Top brand gradient line */}
+      <div
+        aria-hidden
+        className="h-[2px]"
+        style={{ background: `linear-gradient(90deg, ${RED}, ${BLUE})` }}
+      />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-12 py-16 md:py-24">
         <div className="grid md:grid-cols-4 gap-12 md:gap-8 mb-16">
 
           {/* Brand block */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
+            <a
+              href="#accueil"
+              className="flex items-center gap-3 mb-6 w-fit group"
+              aria-label="Retour en haut — R'Home Rénov"
+            >
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center"
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
                 style={{ border: `2px solid ${RED}` }}
+                aria-hidden
               >
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: RED }} />
               </div>
-              <span className="text-lg font-semibold tracking-widest uppercase text-white">
+              <span
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: '1.25rem',
+                  letterSpacing: '0.06em',
+                  color: 'white',
+                }}
+              >
                 R'Home Rénov
               </span>
-            </div>
-            <p className="text-sm text-white/40 font-medium leading-relaxed max-w-xs mb-6">
-              Artisans experts en rénovation, plomberie et chauffage en Haute-Loire.
-              Certifiés RGE pour vos travaux de rénovation énergétique.
+            </a>
+
+            <p
+              className="text-sm leading-relaxed mb-6 max-w-xs"
+              style={{ color: 'rgba(255,255,255,0.35)' }}
+            >
+              Artisans certifiés RGE spécialisés en rénovation, plomberie et chauffage en Haute-Loire.
+              Devis gratuit sous 48h.
             </p>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-start gap-2">
-                <MapPin size={14} color={RED} strokeWidth={1.8} className="mt-0.5 shrink-0" />
-                <span className="text-xs text-white/40 font-medium">
+
+            <address className="not-italic flex flex-col gap-3">
+              <div className="flex items-start gap-2.5">
+                <MapPin size={13} color={RED} strokeWidth={2} aria-hidden className="shrink-0 mt-0.5" />
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   14 Chemin des Rochers, 43120 Monistrol-sur-Loire
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} color={BLUE} strokeWidth={1.8} className="shrink-0" />
+              <div className="flex items-center gap-2.5">
+                <Mail size={13} color={BLUE} strokeWidth={2} aria-hidden className="shrink-0" />
                 <a
                   href="mailto:rhomerenov43@gmail.com"
-                  className="text-xs text-white/40 font-medium hover:text-white transition-colors"
+                  className="text-xs transition-colors duration-200 hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.35)' }}
                 >
                   rhomerenov43@gmail.com
                 </a>
               </div>
-            </div>
+            </address>
           </div>
 
-          {/* Link columns */}
-          {cols.map(({ heading, links }) => (
-            <div key={heading}>
-              <h4 className="text-[10px] font-semibold tracking-widest uppercase text-white/30 mb-5">
-                {heading}
-              </h4>
+          {/* Nav columns */}
+          {COLS.map(({ title, links }) => (
+            <nav key={title} aria-label={title}>
+              <h3
+                className="text-[9px] font-medium tracking-widest uppercase mb-5"
+                style={{ color: 'rgba(255,255,255,0.25)' }}
+              >
+                {title}
+              </h3>
               <ul className="flex flex-col gap-3">
                 {links.map(({ label, href }) => (
                   <li key={label}>
                     <a
                       href={href}
-                      className="text-sm font-medium text-white/50 hover:text-white transition-colors"
+                      className="text-sm transition-colors duration-200 hover:text-white"
+                      style={{ color: 'rgba(255,255,255,0.4)' }}
                     >
                       {label}
                     </a>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/25 font-medium tracking-wide">
-            © {year} R'Home Rénov — Tous droits réservés
+        <div
+          className="border-t pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+          style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <p
+            className="text-xs"
+            style={{ color: 'rgba(255,255,255,0.2)' }}
+          >
+            © {YEAR} R'Home Rénov — Tous droits réservés
           </p>
+
           <a
             href="#accueil"
-            className="flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase transition-opacity hover:opacity-70"
+            className="group flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase transition-opacity duration-200 hover:opacity-100 opacity-60"
             style={{ color: RED }}
+            aria-label="Retour en haut de page"
           >
-            Haut de page <ArrowUpRight size={12} />
+            Haut de page{' '}
+            <ArrowUpRight
+              size={11}
+              aria-hidden
+              className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
           </a>
         </div>
       </div>

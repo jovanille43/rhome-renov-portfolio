@@ -1,140 +1,182 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Bath, Wrench, Flame, Snowflake, ArrowUpRight } from 'lucide-react'
 
 const RED  = '#C8181E'
 const BLUE = '#00A3D5'
 
-const services = [
+const SERVICES = [
   {
-    title: 'Salles de Bain',
-    description:
-      'Conception et réalisation clé en main : carrelage, meubles, douche à l\'italienne, baignoire, sanitaires.',
     Icon: Bath,
+    name: 'Salles de Bain',
+    tagline: 'Clé en main',
+    desc: 'Conception complète : douche à l\'italienne, baignoire îlot, double vasque, carrelage grand format. Du projet à la livraison.',
     accent: RED,
-    href: '#contact',
   },
   {
-    title: 'Plomberie Générale',
-    description:
-      'Installation, modification et réparation des réseaux eau chaude, eau froide et gaz. Dépannage rapide.',
     Icon: Wrench,
+    name: 'Plomberie',
+    tagline: 'Générale & Dépannage',
+    desc: 'Installation, modification et réparation des réseaux eau chaude, froide et gaz. Intervention rapide en Haute-Loire.',
     accent: BLUE,
-    href: '#contact',
   },
   {
-    title: 'Chauffage',
-    description:
-      'Pompe à chaleur, chaudière gaz, plancher chauffant, radiateurs. Certification RGE pour vos aides MaPrimeRénov\'.',
     Icon: Flame,
+    name: 'Chauffage',
+    tagline: 'RGE Certifié',
+    desc: 'Pompe à chaleur, chaudière gaz, plancher chauffant, radiateurs à inertie. Éligible MaPrimeRénov\' et CEE.',
     accent: RED,
-    href: '#contact',
   },
   {
-    title: 'Climatisation',
-    description:
-      'Systèmes split et gainables pour un confort thermique optimal, été comme hiver.',
     Icon: Snowflake,
+    name: 'Climatisation',
+    tagline: 'Confort toute saison',
+    desc: 'Systèmes split et gainables pour un confort thermique optimal été comme hiver. Installation soignée et discrète.',
     accent: BLUE,
-    href: '#contact',
   },
 ]
 
-const card = {
-  hidden: { opacity: 0, y: 28 },
-  visible: (i) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  }),
-}
-
 export default function Services() {
+  const shouldReduce = useReducedMotion()
+  const ease = [0.22, 1, 0.36, 1]
+
   return (
-    <section id="services" className="py-24 md:py-36 px-5 sm:px-8 md:px-12 bg-[#0a0e27] relative overflow-hidden">
-      {/* Ambient glow */}
+    <section
+      id="services"
+      aria-label="Nos services"
+      className="py-24 md:py-36 px-5 sm:px-8 md:px-12 relative overflow-hidden"
+      style={{ background: '#000' }}
+    >
+      {/* Ambient red glow */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
-        style={{ background: `radial-gradient(ellipse, ${RED}18 0%, transparent 70%)` }}
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[280px] rounded-full"
+        style={{ background: `radial-gradient(ellipse, ${RED}14 0%, transparent 70%)` }}
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+
+        {/* ── Section header ── */}
+        <motion.header
+          initial={{ opacity: 0, y: shouldReduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 md:mb-24"
+          transition={{ duration: shouldReduce ? 0 : 0.6, ease }}
+          className="mb-14 md:mb-20"
         >
           <p
-            className="text-xs font-semibold tracking-widest uppercase mb-4"
-            style={{ color: RED }}
+            className="text-xs font-medium tracking-widest uppercase mb-3"
+            style={{ color: RED, fontFamily: "'DM Sans', sans-serif" }}
           >
-            Notre Expertise
+            Notre expertise
           </p>
-          <div className="flex items-end justify-between gap-4 flex-wrap">
+
+          <div className="flex items-end justify-between gap-6 flex-wrap">
             <h2
-              className="text-5xl md:text-7xl font-semibold uppercase tracking-tight text-white"
-              style={{ lineHeight: 0.9 }}
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: 'clamp(3rem, 8vw, 7rem)',
+                lineHeight: 0.88,
+                letterSpacing: '0.04em',
+              }}
             >
-              Nos<br />
+              <span className="text-white">Nos </span>
               <span style={{ color: RED }}>Services</span>
             </h2>
-            <p className="text-sm font-semibold tracking-widest uppercase text-white/50 max-w-xs text-right hidden md:block">
-              Trois domaines de compétence pour transformer vos projets de rénovation en réalité
+
+            <p
+              className="hidden md:block text-xs font-medium tracking-widest uppercase text-white/35 text-right max-w-xs"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Quatre domaines d'expertise pour transformer votre habitat de A à Z
             </p>
           </div>
-          <div className="mt-8 h-px" style={{ background: `linear-gradient(90deg, ${RED}, ${BLUE}, transparent)` }} />
-        </motion.div>
 
-        {/* Service cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
-          {services.map(({ title, description, Icon, accent, href }, i) => (
-            <motion.div
-              key={title}
-              custom={i} variants={card}
-              initial="hidden" whileInView="visible"
+          {/* Separator */}
+          <div
+            className="mt-8 h-px"
+            style={{ background: `linear-gradient(90deg, ${RED}, ${BLUE}, transparent)` }}
+          />
+        </motion.header>
+
+        {/* ── Service cards (liquid glass) ── */}
+        <div
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px"
+          style={{ background: 'rgba(255,255,255,0.04)' }}
+          role="list"
+        >
+          {SERVICES.map(({ Icon, name, tagline, desc, accent }, i) => (
+            <motion.article
+              key={name}
+              role="listitem"
+              initial={{ opacity: 0, y: shouldReduce ? 0 : 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              whileHover={{ y: -4 }}
-              className="group bg-[#0a0e27] p-8 flex flex-col gap-6 relative overflow-hidden cursor-pointer"
+              transition={{ delay: shouldReduce ? 0 : i * 0.1, duration: shouldReduce ? 0 : 0.55, ease }}
+              className="group relative flex flex-col gap-6 p-8 overflow-hidden cursor-pointer"
+              style={{ background: '#000' }}
             >
-              {/* Hover tint */}
+              {/* Hover fill */}
               <div
+                aria-hidden
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{ background: `${accent}0a` }}
+                style={{ background: `${accent}08` }}
               />
 
-              {/* Icon */}
+              {/* Icon badge */}
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
-                style={{ background: `${accent}18`, border: `1px solid ${accent}40` }}
+                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
+                style={{ background: `${accent}14`, border: `1px solid ${accent}30` }}
+                aria-hidden
               >
-                <Icon size={22} color={accent} strokeWidth={1.8} />
+                <Icon size={22} color={accent} strokeWidth={1.6} />
               </div>
 
-              {/* Text */}
-              <div className="flex flex-col gap-3 flex-1">
-                <h3 className="text-lg font-semibold tracking-wide uppercase text-white">
-                  {title}
-                </h3>
-                <p className="text-sm text-white/50 leading-relaxed font-medium">
-                  {description}
+              {/* Text block */}
+              <div className="flex flex-col gap-2 flex-1">
+                <div>
+                  <h3
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: '1.6rem',
+                      letterSpacing: '0.05em',
+                      color: 'white',
+                    }}
+                  >
+                    {name}
+                  </h3>
+                  <p
+                    className="text-[10px] font-medium tracking-widest uppercase mt-0.5"
+                    style={{ color: accent, fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    {tagline}
+                  </p>
+                </div>
+
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: 'rgba(255,255,255,0.45)', fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {desc}
                 </p>
               </div>
 
-              {/* CTA */}
+              {/* CTA link */}
               <a
-                href={href}
-                className="flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase transition-opacity duration-200 group-hover:opacity-100 opacity-50"
-                style={{ color: accent }}
+                href="#contact"
+                className="flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase transition-opacity duration-200 opacity-40 group-hover:opacity-100"
+                style={{ color: accent, fontFamily: "'DM Sans', sans-serif" }}
+                aria-label={`Demander un devis pour ${name}`}
               >
-                Devis gratuit <ArrowUpRight size={14} />
+                Devis gratuit <ArrowUpRight size={12} aria-hidden />
               </a>
 
-              {/* Bottom accent line */}
+              {/* Bottom accent reveal */}
               <div
-                className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-500"
+                aria-hidden
+                className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500"
                 style={{ background: accent }}
               />
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       </div>
