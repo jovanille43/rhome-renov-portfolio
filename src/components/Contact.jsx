@@ -1,155 +1,298 @@
-import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { MapPin, Mail, User, Award, ArrowUpRight, Clock } from 'lucide-react'
+
+const RED  = '#C8181E'
+const BLUE = '#00A3D5'
+const ease = [0.22, 1, 0.36, 1]
+
+const INFOS = [
+  {
+    Icon: MapPin,
+    label: 'Adresse',
+    val: '14 Chemin des Rochers\n43120 Monistrol-sur-Loire',
+    accent: RED,
+  },
+  {
+    Icon: Mail,
+    label: 'Email',
+    val: 'rhomerenov43@gmail.com',
+    href: 'mailto:rhomerenov43@gmail.com',
+    accent: BLUE,
+  },
+  {
+    Icon: Clock,
+    label: 'Disponibilité',
+    val: 'Lun – Ven, 8h – 18h\nRéponse sous 24h',
+    accent: RED,
+  },
+  {
+    Icon: User,
+    label: 'Dirigeant',
+    val: 'Romain Fanget',
+    accent: BLUE,
+  },
+  {
+    Icon: Award,
+    label: 'Certification',
+    val: 'RGE — Reconnu Garant\nde l\'Environnement',
+    accent: RED,
+  },
+]
+
+const SERVICES_OPT = ['Salle de bain', 'Plomberie', 'Chauffage', 'Climatisation', 'Autre']
+
+const inputStyle = {
+  background:   '#0C0C0C',
+  border:       '1px solid rgba(255,255,255,0.08)',
+  color:        'white',
+  fontFamily:   "'DM Sans', sans-serif",
+  fontSize:     '0.875rem',
+  padding:      '0.75rem 1rem',
+  outline:      'none',
+  width:        '100%',
+  borderRadius: 0,
+  transition:   'border-color 200ms',
+}
+
+function Field({ id, label, required, children }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label
+        htmlFor={id}
+        className="text-[10px] font-medium tracking-widest uppercase"
+        style={{ color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Sans', sans-serif" }}
+      >
+        {label}{required && <span aria-hidden> *</span>}
+      </label>
+      {children}
+    </div>
+  )
+}
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    service: '',
-    message: '',
-  })
+  const [form, setForm]       = useState({ name: '', email: '', phone: '', service: '', message: '' })
+  const [sending, setSending] = useState(false)
+  const shouldReduce = useReducedMotion()
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+  const set = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }))
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const mailtoLink = `mailto:rhomerenov43@gmail.com?subject=Demande de ${formData.service}&body=Nom: ${formData.name}%0AEmail: ${formData.email}%0ATéléphone: ${formData.phone}%0A%0AMessage: ${formData.message}`
-    window.location.href = mailtoLink
+    setSending(true)
+    const body = `Nom: ${form.name}\nEmail: ${form.email}\nService: ${form.service}\n\n${form.message}`
+    window.location.href = `mailto:rhomerenov43@gmail.com?subject=${encodeURIComponent('Demande ' + form.service)}&body=${encodeURIComponent(body)}`
+    setTimeout(() => setSending(false), 2000)
   }
 
+  const focusRed  = (e) => (e.target.style.borderColor = RED)
+  const focusBlue = (e) => (e.target.style.borderColor = BLUE)
+  const blur      = (e) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')
+
   return (
-    <section id="contact" className="py-20 px-4 bg-gradient-to-b from-[#0a0e27] to-[#1a1f3a]">
-      <div className="max-w-4xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
+    <section
+      id="contact"
+      aria-labelledby="contact-heading"
+      className="py-24 md:py-36 px-5 sm:px-8 md:px-12"
+      style={{ background: '#000' }}
+    >
+      <div className="max-w-7xl mx-auto">
+
+        {/* Header */}
+        <motion.header
+          initial={{ opacity: 0, y: shouldReduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-4xl md:text-5xl font-bold text-center mb-4"
+          viewport={{ once: true }}
+          transition={{ duration: shouldReduce ? 0 : 0.6, ease }}
+          className="mb-16 md:mb-24"
         >
-          Nous <span className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] bg-clip-text text-transparent">Contacter</span>
-        </motion.h2>
-
-        <div className="grid md:grid-cols-2 gap-12 mt-12">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+          <p
+            className="text-xs font-medium tracking-widest uppercase mb-3"
+            style={{ color: BLUE, fontFamily: "'DM Sans', sans-serif" }}
           >
-            <h3 className="text-2xl font-bold mb-8">Informations</h3>
-            
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-[#3b82f6] font-semibold mb-2">📍 Localisation</h4>
-                <p className="text-gray-400">14 Chemin des Rochers<br />43120 Monistrol-sur-Loire</p>
-              </div>
+            Parlons de votre projet
+          </p>
+          <h2
+            id="contact-heading"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 'clamp(3rem, 8vw, 7rem)',
+              lineHeight: 0.88,
+              letterSpacing: '0.04em',
+            }}
+          >
+            <span className="text-white">Nous </span>
+            <span style={{ color: RED }}>Contacter</span>
+          </h2>
+          <div
+            className="mt-8 h-px"
+            style={{ background: `linear-gradient(90deg, ${RED}, ${BLUE}, transparent)` }}
+          />
+        </motion.header>
 
-              <div>
-                <h4 className="text-[#3b82f6] font-semibold mb-2">📧 Email</h4>
-                <a href="mailto:rhomerenov43@gmail.com" className="text-gray-400 hover:text-[#3b82f6] transition-colors">
-                  rhomerenov43@gmail.com
-                </a>
-              </div>
+        <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-start">
 
-              <div>
-                <h4 className="text-[#3b82f6] font-semibold mb-2">👤 Dirigeant</h4>
-                <p className="text-gray-400">Romain Fanget</p>
-              </div>
+          {/* Info panel */}
+          <motion.div
+            initial={{ opacity: 0, x: shouldReduce ? 0 : -24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: shouldReduce ? 0 : 0.65, ease }}
+            className="flex flex-col gap-10"
+          >
+            <p
+              className="text-sm md:text-base leading-relaxed"
+              style={{ color: 'rgba(255,255,255,0.4)', fontFamily: "'DM Sans', sans-serif", maxWidth: '44ch' }}
+            >
+              Décrivez votre projet, nous vous répondons sous{' '}
+              <strong style={{ color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>48h</strong>{' '}
+              avec une proposition adaptée à vos besoins et à votre budget.
+            </p>
 
-              <div>
-                <h4 className="text-[#3b82f6] font-semibold mb-2">✅ Certification</h4>
-                <p className="text-gray-400">RGE - Reconnu Garant de l'Environnement</p>
-              </div>
-            </div>
+            <dl className="flex flex-col gap-7">
+              {INFOS.map(({ Icon, label, val, href, accent }) => (
+                <div key={label} className="flex items-start gap-4">
+                  <dt className="sr-only">{label}</dt>
+                  <div
+                    aria-hidden
+                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                    style={{ background: `${accent}12`, border: `1px solid ${accent}28` }}
+                  >
+                    <Icon size={15} color={accent} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <p
+                      aria-hidden
+                      className="text-[9px] font-medium tracking-widest uppercase mb-1"
+                      style={{ color: accent, fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {label}
+                    </p>
+                    <dd>
+                      {href ? (
+                        <a
+                          href={href}
+                          className="text-sm font-medium text-white hover:opacity-70 transition-opacity duration-200"
+                          style={{ fontFamily: "'DM Sans', sans-serif", whiteSpace: 'pre-line' }}
+                        >
+                          {val}
+                        </a>
+                      ) : (
+                        <p
+                          className="text-sm font-medium text-white/80"
+                          style={{ fontFamily: "'DM Sans', sans-serif", whiteSpace: 'pre-line' }}
+                        >
+                          {val}
+                        </p>
+                      )}
+                    </dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
           </motion.div>
 
-          <motion.form
-            initial={{ opacity: 0, x: 50 }}
+          {/* Form */}
+          <motion.div
+            initial={{ opacity: 0, x: shouldReduce ? 0 : 24 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            onSubmit={handleSubmit}
-            className="space-y-4"
+            viewport={{ once: true }}
+            transition={{ duration: shouldReduce ? 0 : 0.65, ease }}
           >
-            <div>
-              <label className="block text-sm font-semibold mb-2">Nom</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full bg-[#1a1f3a] border border-[#2563eb]/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#3b82f6] transition-colors"
-                placeholder="Votre nom"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full bg-[#1a1f3a] border border-[#2563eb]/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#3b82f6] transition-colors"
-                placeholder="votre@email.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold mb-2">Téléphone</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full bg-[#1a1f3a] border border-[#2563eb]/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#3b82f6] transition-colors"
-                placeholder="+33..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold mb-2">Service</label>
-              <select
-                name="service"
-                value={formData.service}
-                onChange={handleChange}
-                required
-                className="w-full bg-[#1a1f3a] border border-[#2563eb]/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#3b82f6] transition-colors"
-              >
-                <option value="">Choisir un service</option>
-                <option value="Salle de bain">Salle de bain</option>
-                <option value="Plomberie">Plomberie</option>
-                <option value="Chauffage">Chauffage</option>
-                <option value="Autre">Autre</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold mb-2">Message</label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows="4"
-                className="w-full bg-[#1a1f3a] border border-[#2563eb]/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#3b82f6] transition-colors resize-none"
-                placeholder="Décrivez votre projet..."
-              ></textarea>
-            </div>
-
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full bg-gradient-to-r from-[#2563eb] to-[#3b82f6] py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer"
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-4"
+              aria-label="Formulaire de demande de devis"
             >
-              Envoyer le message
-            </motion.button>
-          </motion.form>
+              <Field id="f-name" label="Nom complet" required>
+                <input
+                  type="text" name="name" id="f-name"
+                  value={form.name} onChange={set} required
+                  placeholder="Votre nom"
+                  aria-required="true"
+                  autoComplete="name"
+                  style={inputStyle}
+                  onFocus={focusRed} onBlur={blur}
+                />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field id="f-email" label="Email" required>
+                  <input
+                    type="email" name="email" id="f-email"
+                    value={form.email} onChange={set} required
+                    placeholder="votre@email.com"
+                    aria-required="true"
+                    autoComplete="email"
+                    style={inputStyle}
+                    onFocus={focusRed} onBlur={blur}
+                  />
+                </Field>
+                <Field id="f-phone" label="Téléphone">
+                  <input
+                    type="tel" name="phone" id="f-phone"
+                    value={form.phone} onChange={set}
+                    placeholder="06 00 00 00 00"
+                    autoComplete="tel"
+                    style={inputStyle}
+                    onFocus={focusBlue} onBlur={blur}
+                  />
+                </Field>
+              </div>
+
+              <Field id="f-service" label="Type de service" required>
+                <select
+                  name="service" id="f-service"
+                  value={form.service} onChange={set} required
+                  aria-required="true"
+                  style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
+                  onFocus={focusRed} onBlur={blur}
+                >
+                  <option value="" style={{ background: '#0C0C0C' }}>Choisir un service</option>
+                  {SERVICES_OPT.map((s) => (
+                    <option key={s} value={s} style={{ background: '#0C0C0C' }}>{s}</option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field id="f-message" label="Description du projet" required>
+                <textarea
+                  name="message" id="f-message"
+                  value={form.message} onChange={set} required
+                  rows={5}
+                  placeholder="Décrivez votre projet : surface, contraintes, délai souhaité…"
+                  aria-required="true"
+                  style={{ ...inputStyle, resize: 'none' }}
+                  onFocus={focusRed} onBlur={blur}
+                />
+              </Field>
+
+              <motion.button
+                type="submit"
+                disabled={sending}
+                whileHover={shouldReduce ? {} : { scale: 1.015 }}
+                whileTap={shouldReduce ? {} : { scale: 0.985 }}
+                className="flex items-center justify-center gap-2 w-full py-4 font-medium text-xs tracking-widest uppercase text-white transition-opacity duration-200 disabled:opacity-60 cursor-pointer"
+                style={{ background: RED, fontFamily: "'DM Sans', sans-serif" }}
+                aria-live="polite"
+                aria-disabled={sending}
+              >
+                {sending
+                  ? 'Ouverture de votre messagerie…'
+                  : <><span>Envoyer la demande</span><ArrowUpRight size={14} aria-hidden /></>
+                }
+              </motion.button>
+
+              <p
+                className="text-[10px] text-center"
+                style={{ color: 'rgba(255,255,255,0.2)', fontFamily: "'DM Sans', sans-serif" }}
+                aria-live="polite"
+              >
+                Réponse garantie sous 48h — Devis gratuit et sans engagement
+              </p>
+            </form>
+          </motion.div>
         </div>
       </div>
     </section>
